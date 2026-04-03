@@ -12,7 +12,7 @@ function App() {
   const [isPasted, setIsPasted] = useState<boolean>(false);
   const [pasteCount, setPasteCount] = useState<number>(0);
 
-  const [darkMode, setDarkMode] = useState<boolean>(false);
+  const [darkMode, setDarkMode] = useState<boolean>(true);
 
   const hasStarted = useRef<boolean>(false);
 
