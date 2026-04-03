@@ -1,46 +1,60 @@
-#  Vi-Notes
+# Vi-Notes
 
-A simple React + TypeScript note-taking app that tracks typing behavior and detects whether content is typed or pasted.
+A simple React + TypeScript note-taking app that tracks typing behavior and detects whether content is typed or pasted. Now deployed on Vercel for live usage!
 
 ---
 
-##  Features
+## Live Demo
 
-- Track keystrokes, backspaces, and typing time  
+🌐 [View Vi-Notes on Vercel](https://vi-notes-aj.vercel.app/)
+
+---
+
+## Features
+
+- Track keystrokes, backspaces, and typing duration  
 - Detect pasted content  
-- Calculate authenticity score  
-- Show character & word count  
-- Copy, paste, and clear text  
+- Calculate authenticity score in real-time  
+- Display character and word counts  
+- Copy, paste, and clear text functionality  
 - Dark / Light mode toggle  
+- Save writing session data locally (JSON export)  
 
 ---
 
-##  Authenticity Score
+## Authenticity Score
 
-Score is calculated based on:
+The score is calculated based on:
+
 - Paste usage  
 - Typing speed  
 - Backspace usage  
 - Total key presses  
 
-**Result:**
-- High score → Likely human  
-- Low score → Likely pasted/AI  
+**Result interpretation:**
+
+- **High score** → Likely human-written  
+- **Low score** → Likely AI-generated or pasted content  
 
 ---
 
-##  Tech Stack
+## Tech Stack
 
 - React  
 - TypeScript  
-- Hooks  
+- React Hooks  
 
 ---
 
-##  Setup
+## Setup (Local Development)
 
 ```bash
-git clone https://github.com/your-username/vi-notes.git
+# Clone the repository
+git clone https://github.com/Jitesh-JK/Vi_Notes_Anmol_Jitesh.git
 cd vi-notes
+
+# Install dependencies
 npm install
+
+# Start the development server
 npm run dev
