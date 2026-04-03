@@ -13,21 +13,16 @@ function App() {
 
   const hasStarted = useRef<boolean>(false);
 
-  const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
-    setText(e.target.value);
-  };
+  // --- Handlers ---
+  const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => setText(e.target.value);
 
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (!hasStarted.current) {
       setStartTime(Date.now());
       hasStarted.current = true;
     }
-
     setKeyCount((prev) => prev + 1);
-
-    if (e.key === "Backspace") {
-      setBackspaceCount((prev) => prev + 1);
-    }
+    if (e.key === "Backspace") setBackspaceCount((prev) => prev + 1);
   };
 
   const handlePaste = () => {
@@ -35,14 +30,30 @@ function App() {
     setPasteCount((prev) => prev + 1);
   };
 
-  const toggleTheme = () => {
-    setDarkMode((prev) => !prev);
+  const toggleTheme = () => setDarkMode((prev) => !prev);
+
+  const clearText = () => {
+    setText("");
+    setKeyCount(0);
+    setBackspaceCount(0);
+    setPasteCount(0);
+    setIsPasted(false);
+    setStartTime(null);
+    hasStarted.current = false;
   };
 
-  const getTimeElapsed = () => {
-    if (!startTime) return 0;
-    return Math.floor((Date.now() - startTime) / 1000);
+  const copyText = () => navigator.clipboard.writeText(text).then(() => alert("Text copied!"));
+
+  const pasteText = () => {
+    navigator.clipboard.readText().then((clipText) => {
+      setText((prev) => prev + clipText);
+      setIsPasted(true);
+      setPasteCount((prev) => prev + 1);
+    }).catch(() => alert("Unable to access clipboard."));
   };
+
+  // --- Utility Functions ---
+  const getTimeElapsed = () => (startTime ? Math.floor((Date.now() - startTime) / 1000) : 0);
 
   const calculateScore = () => {
     let score = 100;
@@ -58,19 +69,18 @@ function App() {
     if (time < 5 && text.length > 50) score -= 10;
 
     if (score < 0) score = 0;
-
     return score;
   };
 
   const score = calculateScore();
 
   const getMessage = () => {
-    if (score > 80) return "✅ Likely Human Written";
-    if (score > 50) return "⚠️ Some Suspicious Activity";
-    return "❌ Likely AI / Pasted Content";
+    if (score > 80) return " Likely Human Written";
+    if (score > 50) return " Some Suspicious Activity";
+    return " Likely AI / Pasted Content";
   };
 
-  // 🎨 Dynamic Styles
+  // --- Styles ---
   const containerStyle = {
     padding: "20px",
     fontFamily: "Arial",
@@ -79,6 +89,7 @@ function App() {
     minHeight: "100vh",
   };
 
+  const headerColor = darkMode ? "#90caf9" : "#1a237e";
   const textareaStyle = {
     width: "100%",
     padding: "10px",
@@ -89,14 +100,56 @@ function App() {
     color: darkMode ? "#ffffff" : "#000000",
   };
 
+  const buttonStyle = {
+    padding: "8px 15px",
+    fontSize: "14px",
+    borderRadius: "5px",
+    border: "none",
+    cursor: "pointer",
+  };
+
   return (
     <div style={containerStyle}>
-      <h1>Vi-Notes</h1>
+      {/* Top bar with Dark/Light Mode */}
+      <div style={{ display: "flex", justifyContent: "flex-start", marginBottom: "15px" }}>
+        <button
+          onClick={toggleTheme}
+          style={{ ...buttonStyle, backgroundColor: darkMode ? "#bb86fc" : "#6200ee", color: "#fff" }}
+        >
+          {darkMode ? " Light Mode" : " Dark Mode"}
+        </button>
+      </div>
 
-      <button onClick={toggleTheme} style={{ marginBottom: "10px" }}>
-        {darkMode ? "☀️ Light Mode" : "🌙 Dark Mode"}
-      </button>
+      {/* Header */}
+      <h1 style={{ color: headerColor }}>Vi-Notes</h1>
 
+      {/* Buttons above textarea */}
+      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "10px" }}>
+        <div>
+          <button
+            onClick={copyText}
+            style={{ ...buttonStyle, backgroundColor: "#4caf50", color: "#fff", marginRight: "10px" }}
+          >
+             Copy
+          </button>
+          <button
+            onClick={pasteText}
+            style={{ ...buttonStyle, backgroundColor: "#2196f3", color: "#fff" }}
+          >
+             Paste
+          </button>
+        </div>
+        <div>
+          <button
+            onClick={clearText}
+            style={{ ...buttonStyle, backgroundColor: "#f44336", color: "#fff" }}
+          >
+             Clear
+          </button>
+        </div>
+      </div>
+
+      {/* Textarea */}
       <textarea
         rows={15}
         placeholder="Start typing your notes..."
@@ -107,12 +160,10 @@ function App() {
         style={textareaStyle}
       />
 
+      {/* Stats & Score */}
       <div style={{ marginTop: "15px" }}>
         <p><strong>Characters:</strong> {text.length}</p>
-        <p>
-          <strong>Words:</strong>{" "}
-          {text.trim() === "" ? 0 : text.trim().split(/\s+/).length}
-        </p>
+        <p><strong>Words:</strong> {text.trim() === "" ? 0 : text.trim().split(/\s+/).length}</p>
         <p><strong>Total Keys Pressed:</strong> {keyCount}</p>
         <p><strong>Backspaces:</strong> {backspaceCount}</p>
         <p><strong>Paste Count:</strong> {pasteCount}</p>
@@ -120,13 +171,13 @@ function App() {
 
         {isPasted && (
           <p style={{ color: "red", fontWeight: "bold" }}>
-            ⚠️ Pasted content detected!
+            Pasted content detected!
           </p>
         )}
 
         <hr />
 
-        <h2>Authenticity Score: {score}%</h2>
+        <h2 style={{ color: headerColor }}>Authenticity Score: {score}%</h2>
         <p><strong>{getMessage()}</strong></p>
       </div>
     </div>
